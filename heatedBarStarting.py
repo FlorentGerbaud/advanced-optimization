@@ -89,10 +89,8 @@ def compute_source(Var_opt):
     S = np.zeros(Xg.shape)
 
     #perform the source terms on the interval
-
-    for i in range(n_no-1):
-        S[i] = performBernstein(X[i],Var_opt)
-    print(S)
+    for i in range(Xg.shape[0]):
+        S[i] = performBernstein(Xg[i],Var_opt)
     return S
 
 ############################################################################################################
