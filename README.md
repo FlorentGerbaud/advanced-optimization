@@ -104,22 +104,27 @@ where $ k(x) $ is the conduction coefficient, $ T(x) $ is the temperature, and \
 
 #### Cost Function
 The cost function $ J(T) $ is defined as:
+
 $$
 J(T) = \frac{1}{2} \int_{0}^{l} (T(x) - T^*(x))^2 \, dx
 $$
 
 #### Lagrangian
 The Lagrangian $ L $ is defined as the sum of the cost function and the heat equation multiplied by the Lagrange multiplier \( \lambda(x) \):
+
 $$
 L(T, \lambda) = J(T) + \int_{0}^{l} \lambda(x) \left( \frac{d}{dx}\left(k(x) \frac{dT}{dx}\right) - S(x) \right) \, dx
 $$
 
 #### Adjoint Equation
 The adjoint equation is derived by setting the derivative of the Lagrangian with respect to $ T $ to zero:
+
 $$
 \frac{\delta L}{\delta T} = 0
 $$
+
 This results in:
+
 $$
 \begin{cases}
 \frac{d}{dx}\left(k(x) \frac{d\lambda}{dx}\right) = - (T(x) - T^*(x)) \\
@@ -136,7 +141,7 @@ $$
 \frac{\delta J}{\delta Var_{opt}[i]} = -\int_{0}^{l} \lambda(x) B_i(x) \, dx
 $$
 
-where $ B_i(x) $ is the Bernstein polynomial of degree $ dim\_opt - 1 $:
+where `B_i(x)` is the Bernstein polynomial of degree $ dim\_opt - 1 $:
 
 $$
 B_i(x) = \binom{dim\_opt - 1}{i} x^i (1-x)^{dim\_opt - 1 - i}
