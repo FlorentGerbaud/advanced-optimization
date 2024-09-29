@@ -98,6 +98,7 @@ The heat equation is given by:
 $$
 \frac{d}{dx}\left(k(x) \frac{dT}{dx}\right) = S(x)
 $$
+
 where $ k(x) $ is the conduction coefficient, $ T(x) $ is the temperature, and \( S(x) \) is the heat source.
 
 #### Cost Function
