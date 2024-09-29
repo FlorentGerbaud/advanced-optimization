@@ -1,5 +1,5 @@
 # Advanced-optimization
-
+\( K(x) \)
 # README for Heat Source Optimization Project
 
 ## Overview
