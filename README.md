@@ -130,10 +130,13 @@ $$
 
 #### Gradient Calculation
 The gradient of the cost function with respect to the design variables $ Var_{opt} $ is given by:
+
 $$
 \frac{\delta J}{\delta Var_{opt}[i]} = -\int_{0}^{l} \lambda(x) B_i(x) \, dx
 $$
+
 where $ B_i(x) $ is the Bernstein polynomial of degree $ dim\_opt - 1 $:
+
 $$
 B_i(x) = \binom{dim\_opt - 1}{i} x^i (1-x)^{dim\_opt - 1 - i}
 $$
