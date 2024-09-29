@@ -95,6 +95,7 @@ This will execute the simulation, compute the initial temperature distribution, 
 
 #### Heat Equation
 The heat equation is given by:
+
 $$
 \frac{d}{dx}\left(k(x) \frac{dT}{dx}\right) = S(x)
 $$
