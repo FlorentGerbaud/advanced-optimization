@@ -100,24 +100,24 @@ $$
 \frac{d}{dx}\left(k(x) \frac{dT}{dx}\right) = S(x)
 $$
 
-where $ k(x) $ is the conduction coefficient, $ T(x) $ is the temperature, and \( S(x) \) is the heat source.
+where ` k(x) ` is the conduction coefficient, ` T(x) ` is the temperature, and ` S(x) ` is the heat source.
 
 #### Cost Function
-The cost function $ J(T) $ is defined as:
+The cost function ` J(T) ` is defined as:
 
 $$
 J(T) = \frac{1}{2} \int_{0}^{l} (T(x) - T^*(x))^2 \, dx
 $$
 
 #### Lagrangian
-The Lagrangian $ L $ is defined as the sum of the cost function and the heat equation multiplied by the Lagrange multiplier \( \lambda(x) \):
+The Lagrangian ` L ` is defined as the sum of the cost function and the heat equation multiplied by the Lagrange multiplier ` \lambda(x) `:
 
 $$
 L(T, \lambda) = J(T) + \int_{0}^{l} \lambda(x) \left( \frac{d}{dx}\left(k(x) \frac{dT}{dx}\right) - S(x) \right) \, dx
 $$
 
 #### Adjoint Equation
-The adjoint equation is derived by setting the derivative of the Lagrangian with respect to $ T $ to zero:
+The adjoint equation is derived by setting the derivative of the Lagrangian with respect to ` T ` to zero:
 
 $$
 \frac{\delta L}{\delta T} = 0
@@ -135,13 +135,13 @@ $$
 
 
 #### Gradient Calculation
-The gradient of the cost function with respect to the design variables $ Var_{opt} $ is given by:
+The gradient of the cost function with respect to the design variables ` Var_{opt} ` is given by:
 
 $$
 \frac{\delta J}{\delta Var_{opt}[i]} = -\int_{0}^{l} \lambda(x) B_i(x) \, dx
 $$
 
-where `B_i(x)` is the Bernstein polynomial of degree $ dim\_opt - 1 $:
+where `B_i(x)` is the Bernstein polynomial of degree ` dim\_opt - 1 `:
 
 $$
 B_i(x) = \binom{dim\_opt - 1}{i} x^i (1-x)^{dim\_opt - 1 - i}
@@ -149,16 +149,18 @@ $$
 
 #### Discretization
 The integral is discretized using the method of rectangles:
+
 $$
 \nabla_i = -\int_{0}^{l} \lambda(x) B_i(Xg(x)) \, dx \approx -\sum_{j=0}^l \lambda(j) \cdot B_i(Xg[j]) \cdot h
 $$
-where $ h $ is the element size.
+
+where `h` is the element size.
 
 ## Optimization Report
 
 ### Introduction
 
-The objective of this program is to solve a 1D heat conduction problem using optimization methods. The problem involves adjusting a heat source function, modeled by Bernstein polynomials, so that the simulated temperature matches a target temperature $ T^{\star} $.
+The objective of this program is to solve a 1D heat conduction problem using optimization methods. The problem involves adjusting a heat source function, modeled by Bernstein polynomials, so that the simulated temperature matches a target temperature ` T^{\star} `.
 
 The optimization is performed using gradient descent, with two strategies: one with a fixed step size and the other with optimal step size search (line search). The adjoint equation is used to compute the gradient of the cost function, which measures the difference between the simulated and target temperatures.
 
@@ -166,16 +168,16 @@ The optimization is performed using gradient descent, with two strategies: one w
 
 #### Physical Problem
 
-The simulation of the heat conduction problem is based on a finite element discretization model. Thermal conductivity is modeled by a function $ K(x) $ that can include noise to simulate uncertainties. The heat source term is expressed by Bernstein polynomials parameterized by an optimization variable vector `Var_opt`.
+The simulation of the heat conduction problem is based on a finite element discretization model. Thermal conductivity is modeled by a function ` K(x) ` that can include noise to simulate uncertainties. The heat source term is expressed by Bernstein polynomials parameterized by an optimization variable vector `Var_opt`.
 
-The main conduction equation is solved in the form $ M \cdot T = \text{RHS} $, where $ M $ is the system matrix, $ T $ is the temperature, and `RHS` is the right-hand side corresponding to the heat source.
+The main conduction equation is solved in the form ` M \cdot T = \text{RHS} `, where ` M ` is the system matrix, ` T ` is the temperature, and `RHS` is the right-hand side corresponding to the heat source.
 
 #### Main Functions
 
 - **`compute_conduction(noise_val)`**: generates the thermal conductivity function with or without noise.
 - **`performBernstein(t, Var_opt)`**: evaluates a Bernstein polynomial based on the optimization variables.
-- **`compute_matrix(K)`**: builds the system matrix based on conductivity \( K(x) \).
-- **`compute_rhs(S)`**: generates the system's right-hand side based on the heat source \( S(x) \).
+- **`compute_matrix(K)`**: builds the system matrix based on conductivity ` K(x) `.
+- **`compute_rhs(S)`**: generates the system's right-hand side based on the heat source ` S(x) `.
 - **`simulator(noise, Var)`**: solves the system based on the optimization variables to compute the temperature.
 
 ### Gradient Descent Optimization
@@ -190,7 +192,7 @@ $$
 J(T) = \frac{1}{2} \sum (T - T^{\star})^2 h
 $$
 
-where $ T^{\star} $ is the target temperature, $ T $ is the simulated temperature, and $ h $ is the element size.
+where ` T^{\star} ` is the target temperature, `T` is the simulated temperature, and `h` is the element size.
 
 #### Adjoint Equation
 
@@ -202,13 +204,13 @@ The gradient of the cost function is then computed using the solution of the adj
 
 Two gradient descent methods are implemented:
 
-- **Gradient descent with fixed step**: A constant learning rate $ \alpha $ is used to adjust the optimization variables at each iteration.
+- **Gradient descent with fixed step**: A constant learning rate ` \alpha ` is used to adjust the optimization variables at each iteration.
 - **Gradient descent with line search**: The optimal step size is determined at each iteration through a line search, improving convergence.
 
 The implemented functions for gradient descent are:
 
-- **`compute_adjoint(T, T_star, K)`**: solves the adjoint equation to calculate the Lagrange multiplier $ \lambda $.
-- **`compute_gradient(lambda_adj, Var_opt)`**: computes the gradient of the cost function based on $ \lambda $ and the optimization variables.
+- **`compute_adjoint(T, T_star, K)`**: solves the adjoint equation to calculate the Lagrange multiplier ` \lambda `.
+- **`compute_gradient(lambda_adj, Var_opt)`**: computes the gradient of the cost function based on ` \lambda ` and the optimization variables.
 - **`gradient_descent(Var_opt, alpha, iterations)`**: runs gradient descent with a fixed step size.
 - **`line_search(u, grad_u, cost_func)`**: performs the line search to find the optimal step size.
 - **`gradient_descent_with_line_search(Var_opt, iterations)`**: runs gradient descent with line search.
@@ -231,7 +233,7 @@ The two methods (fixed step and line search) are compared over 10,000 iterations
 
 #### Visualizations
 
-1. **Conductivity coefficient**: A plot of $ K(x) $ is shown to visualize the variation of conductivity across the domain.
+1. **Conductivity coefficient**: A plot of ` K(x) ` is shown to visualize the variation of conductivity across the domain.
    
 2. **Error comparison**: A log-log plot is generated to compare the convergence of errors for both optimization methods.
 
