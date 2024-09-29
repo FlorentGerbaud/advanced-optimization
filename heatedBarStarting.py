@@ -301,7 +301,7 @@ def gradient_descent_with_line_search(Var_opt, iterations):
 
 
 # Ouvrir un fichier pour écrire les sorties
-with open("Results for 1000 iterations/CompareMethod_1000.Results", "w") as f:
+with open("Results for 10000 iterations/CompareMethod_1000.Results", "w") as f:
     # Mesurer le temps de traitement total
     start_time = time.time()
 
@@ -313,7 +313,7 @@ with open("Results for 1000 iterations/CompareMethod_1000.Results", "w") as f:
 
     # Parameters for optimization
     alpha = 0.01
-    iterations = 1000
+    iterations = 10000
 
     # Run gradient descent with fixed learning rate
     start_fixed_step_time = time.time()  # Démarrer le chronomètre pour la méthode à pas fixe

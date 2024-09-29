@@ -1,0 +1,9 @@
+Optimized design variables with fixed step: [-1.05695273 -1.99461876 -2.34374064 -1.75648208 -0.55012162  0.34627716]
+Processing Time (Fixed Step): 96.71 seconds
+Optimized design variables with optimal step: [-21.35409235  34.77812132 -19.41514473 -32.93995327  45.66033212
+ -21.2313918 ]
+Processing Time (Optimal Step): 1098.41 seconds
+Error between Initial and Target Temperature: 0.0104
+Error between Fixed Step Optimization and Target Temperature: 0.0003
+Error between Optimal Step Optimization and Target Temperature: 0.0001
+Total Processing Time: 1196.77 seconds
