@@ -1,7 +1,8 @@
 #_______________________________________ import modules _______________________________________#
 
 from variables import *
-import problemToSolve as pb
+import costFunction as cf
+import FEM as FiniteElement
 import optimisation as opt
 
 #_______________________________________ main program _______________________________________#
@@ -10,17 +11,17 @@ import optimisation as opt
 if __name__ == '__main__':
 
     # without noise
-    K_ref = pb.compute_conduction(0)
+    K_ref = FiniteElement.compute_conduction(0)
 
     # solve the problem for initial conditions
-    T_ini = pb.simulator(0, Var_ini, dim_opt)
+    T_ini = FiniteElement.simulator(0, Var_ini, dim_opt)
 
     # choice = 1 for the comparison of the two methods
     # choice = 2 compare gradient value for the two methods
     # choice = 3 compare fixed step with different alpha valuees from 0.01 to 20
     # choice = 4 compare the error with the target for both method from fixed step and optimal step with number of Var from 2 to 100
 
-    choice = 4
+    choice = 1
 
     if choice == 1:
 
