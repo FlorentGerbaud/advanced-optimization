@@ -5,6 +5,7 @@ import costFunction as cf
 import FEM as FiniteElement
 import optimisation as opt
 import projectionMethod as proj
+import LagrangianMethod as lag
 
 #_______________________________________ main program _______________________________________#
 ##############################################################################################
@@ -22,7 +23,7 @@ if __name__ == '__main__':
     # choice = 3 compare fixed step with different alpha valuees from 0.01 to 20
     # choice = 4 compare the error with the target for both method from fixed step and optimal step with number of Var from 2 to 100
 
-    choice = 6
+    choice = 9
 
     if choice == 1:
 
@@ -67,3 +68,34 @@ if __name__ == '__main__':
                                                          T_ini = T_ini)
 
 
+    elif choice == 7:
+
+        lag.solveLagrangienFunction(Var_ini = Var_ini
+                                      , alpha = alpha
+                                      , iterations = iterations
+                                      , K_ref = K_ref
+                                      , dim_opt = dim_opt
+                                      , T_ini = T_ini
+                                      , beta = beta
+                                      , alpha_1 = alpha_1
+                                      , alpha_2 = alpha_2)
+
+    elif choice == 8:
+
+        lag.findBestAlpha_1(Var_ini = Var_ini,
+                            alpha_1=alpha_1,
+                            alpha_2=alpha_2,
+                            iterations=iterations,
+                            K_ref=K_ref,
+                            dim_opt=dim_opt,
+                            beta=beta)
+
+    elif choice == 9:
+
+        lag.findbestAlpha_2(Var_ini = Var_ini,
+                            alpha_1=alpha_1,
+                            alpha_2=alpha_2,
+                            iterations=iterations,
+                            K_ref=K_ref,
+                            dim_opt=dim_opt,
+                            beta=beta)

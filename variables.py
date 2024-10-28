@@ -23,7 +23,7 @@ T_star = np.ones(X.shape) + (X / l) ** 2
 
 # Parameters for optimization
 alpha = 20
-iterations = 200
+iterations = 100
 
 # initial design vector that parameterizes heat sources
 dim_opt = 6
@@ -31,3 +31,9 @@ Var_ini = np.full(dim_opt, 0.0)
 #with optimal descent gradient
 #Var_ini = np.array([-21.36202421, 34.90290328, -19.76296709, -32.44794981, 45.26660816, -21.05999423])
 rng = np.random.default_rng(seed=2024)
+
+# _______________________________________ For lagrangian method  _______________________________________#
+
+beta = 0
+alpha_1 = 20
+alpha_2 = 0.01

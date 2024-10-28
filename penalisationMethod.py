@@ -1,12 +1,10 @@
 from gradientDescent import *
-# Run gradient descent with fixed learning rate
 from variables import *
 import FEM as FiniteElement
 import matplotlib
 matplotlib.use('Agg')  # or another interactive backend like 'Qt5Agg'
 import matplotlib.pyplot as plt
 import numpy as np
-
 
 
 def comparePerformedGradient(dim_opt, K_ref, pen):
@@ -53,14 +51,50 @@ Var_ini = np.random.rand(dim_opt)
 #pen=0.048
 pen_fixe = 0.0247
 pen_opt = 0.0247
-if choice == 0:
 
-    # Var_optWithFixStep, errors_fixed_step = augmentedGradient_descent_with_line_search(Var_ini,
-    #                                                                     iterations,
-    #                                                                     K_ref,
-    #                                                                     dim_opt,
-    #                                                                     pen_opt)
-    Var_optWithFixStep, errors_fixed_step = augmentedGradient_descent(Var_ini, alpha, iterations, K_ref, dim_opt, pen_fixe)
+def findBestPenalityValues(Var_ini, iterations, K_ref, dim_opt):
+    # Define the penalty values to test
+    penalty_values = np.linspace(10e-6, 10e-3, 10)
+    errors = []
+    integralValues = []
+
+    # Iterate over penalty values to compute errors and integral values
+    for pen in penalty_values:
+        Var_optWithFixStep, errors_fixed_step = augmentedGradient_descent_with_line_search(Var_ini,
+                                                                                           iterations,
+                                                                                           K_ref,
+                                                                                           dim_opt,
+                                                                                           pen)
+        TFixedStep = simulator(0, Var_optWithFixStep, dim_opt)
+        errors.append(costFunction(TFixedStep))  # Cost function
+        S_check = compute_source(Var_optWithFixStep, dim_opt)
+        integralS_x = np.sum(S_check) * h
+        integralValues.append(integralS_x)  # Integral of S
+
+    # Plotting Error in Log-Log Scale
+    plt.figure(figsize=(10, 5))
+    plt.plot(penalty_values, errors, label="Error", marker='o')
+    plt.xlabel("Penalty Value")
+    plt.ylabel("Error")
+    plt.title("Error vs Penalty Value (Log-Log Scale)")
+    plt.grid(True)
+    plt.legend()
+    plt.savefig("error-pen")
+
+    # Plotting Integral of S in Log-Log Scale
+    plt.figure(figsize=(10, 5))
+    plt.plot(penalty_values, integralValues, label="Integral of S", marker='x')
+    plt.xlabel("Penalty Value")
+    plt.ylabel("Integral of S")
+    plt.title("Integral of S vs Penalty Value (Log-Log Scale)")
+    plt.grid(True)
+    plt.legend()
+    plt.savefig("integral-pen")
+
+
+def solvePenalityMethod(Var_ini, iterations, K_ref, dim_opt, pen):
+    Var_optWithFixStep, errors_fixed_step = augmentedGradient_descent(Var_ini, alpha, iterations, K_ref, dim_opt,
+                                                                      pen_fixe)
     TFixedStep = simulator(0, Var_optWithFixStep, dim_opt)
     print("Optimized design variables with fixed step: ", Var_optWithFixStep)
 
@@ -70,7 +104,8 @@ if choice == 0:
     print("Integral of the source: ", integralS_x)
 
     print("Error between Initial and Target Temperature: ", costFunction(TFixedStep))
-    print("Error between Initial and Target Temperature with penalty term: ", augmentedCostFunction(TFixedStep, Var_optWithFixStep, dim_opt, pen_opt))
+    print("Error between Initial and Target Temperature with penalty term: ",
+          augmentedCostFunction(TFixedStep, Var_optWithFixStep, dim_opt, pen_opt))
 
     # Tracer le graphique log-log des erreurs
     plt.figure(figsize=(10, 6))
@@ -107,44 +142,4 @@ if choice == 0:
     plt.grid()
     plt.savefig("source-term1.png")
 
-elif choice == 1:
-    # Define the penalty values to test
-    penalty_values = np.linspace(10e-6, 10e-3, 10)
-    errors = []
-    integralValues = []
 
-    # Iterate over penalty values to compute errors and integral values
-    for pen in penalty_values:
-        Var_optWithFixStep, errors_fixed_step = augmentedGradient_descent_with_line_search(Var_ini,
-                                                                          iterations,
-                                                                          K_ref,
-                                                                          dim_opt,
-                                                                          pen)
-        TFixedStep = simulator(0, Var_optWithFixStep, dim_opt)
-        errors.append(costFunction(TFixedStep))  # Cost function
-        S_check = compute_source(Var_optWithFixStep, dim_opt)
-        integralS_x = np.sum(S_check) * h
-        integralValues.append(integralS_x)  # Integral of S
-
-    # Plotting Error in Log-Log Scale
-    plt.figure(figsize=(10, 5))
-    plt.plot(penalty_values, errors, label="Error", marker='o')
-    plt.xlabel("Penalty Value")
-    plt.ylabel("Error")
-    plt.title("Error vs Penalty Value (Log-Log Scale)")
-    plt.grid(True)
-    plt.legend()
-    plt.savefig("error-pen")
-
-    # Plotting Integral of S in Log-Log Scale
-    plt.figure(figsize=(10, 5))
-    plt.plot(penalty_values, integralValues, label="Integral of S", marker='x')
-    plt.xlabel("Penalty Value")
-    plt.ylabel("Integral of S")
-    plt.title("Integral of S vs Penalty Value (Log-Log Scale)")
-    plt.grid(True)
-    plt.legend()
-    plt.savefig("integral-pen")
-
-elif choice == 2:
-    comparePerformedGradient(dim_opt, K_ref, pen_fixe)
