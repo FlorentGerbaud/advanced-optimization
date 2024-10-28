@@ -87,24 +87,55 @@ def finite_difference_gradient_centered(Var_opt, epsilon, dim_opt):
 
     return grad
 
+def augmentedFinite_difference_gradient_centered(Var_opt, epsilon, dim_opt, pen):
+    """
+    Compute the gradient of the cost function using finite differences with centered scheme
+    :param Var_opt: the vector of design variables
+    :param epsilon: the perturbation value
+    :return: the gradient of the cost function
+    """
+    grad = np.zeros(dim_opt)
+
+    for i in range(dim_opt):
+        Var_perturbed = Var_opt.copy()
+        Var_perturbed[i] += epsilon
+        T_perturbed = simulator(0, Var_perturbed, dim_opt)
+        error_perturbed = augmentedCostFunction(T_perturbed, Var_perturbed, dim_opt, pen)
+
+        Var_perturbed[i] -= 2 * epsilon
+        T_perturbed = simulator(0, Var_perturbed, dim_opt)
+        error_perturbed -= augmentedCostFunction(T_perturbed, Var_perturbed, dim_opt, pen)
+
+        grad[i] = error_perturbed / (2 * epsilon)
+
+    return grad
+
 
 def augmentedCompute_gradient(lambda_adj, Var_opt, dim_opt, pen):
     """
     Compute the gradient of the cost function with respect to Var_opt, including the energy constraint term.
     """
     S = compute_source(Var_opt, dim_opt)  # Heat source
+    # Energy constraint gradient (additional term)
+    energy_grad = np.sum(S) * h  # The energy constraint term
+    lambda_c = pen  # Penalty coefficient
     # Original gradient: using the adjoint solution
     grad = np.zeros_like(Var_opt)
+    integraleB_i = np.zeros_like(Var_opt)
+
     for i in range(dim_opt):
         for j in range(Xg.shape[0]):
             grad[i] += - lambda_adj[j] * math.comb(dim_opt - 1, i) * Xg[j] ** i * (1 - Xg[j]) ** (dim_opt - 1 - i) * h
 
-    # Energy constraint gradient (additional term)
-    energy_grad = np.sum(S) * h  # The energy constraint term
-    lambda_c = pen  # Penalty coefficient
-    energy_penalty_grad = 2 * lambda_c * energy_grad  # Derivative of energy penalty term
+    for i in range(dim_opt):
+        for j in range(Xg.shape[0]):
+            integraleB_i[i] +=  math.comb(dim_opt - 1, i) * Xg[j] ** i * (1 - Xg[j]) ** (dim_opt - 1 - i) * h
 
+    energy_penalty_grad = 2 * lambda_c * energy_grad * integraleB_i # Derivative of energy penalty term
     # Adjust the gradient
     grad += energy_penalty_grad
 
     return grad
+
+
+

@@ -107,13 +107,14 @@ def augmentedGradient_descent_with_line_search(Var_opt, iterations, K_ref, dim_o
         lambda_adj = compute_adjoint(T, T_star, K_ref)
         grad = augmentedCompute_gradient(lambda_adj, Var_opt, dim_opt, pen)
         alpha = augmentedLine_search(Var_opt, grad, costFunction, dim_opt, pen)
+        print("alpha", alpha)
         Var_opt -= alpha * grad
         cost = augmentedCostFunction(T, Var_opt, dim_opt, pen)
         errors.append(cost)  # Ajouter l'erreur à la liste
         #print(f"Iteration {iter+1}, Cost Function: {cost}, Optimal Alpha: {alpha}")
     return Var_opt, errors
 
-def augmentedLine_search(u, grad_u, Var_opt, dim_opt, pen):
+def augmentedLine_search(u, grad_u, cost_function, dim_opt, pen):
     """
     Perform line search to find the optimal step size alpha.
     :param u: the current design variables
@@ -129,7 +130,7 @@ def augmentedLine_search(u, grad_u, Var_opt, dim_opt, pen):
         u_new = u - alpha * grad_u
         # we perform T because the cost function is defined as a function of T and not u
         T = simulator(0, u_new, dim_opt)  # Forward problem simulation
-        return augmentedCostFunction(T, Var_opt, dim_opt, pen)  # Return the cost function value
+        return augmentedCostFunction(T, u, dim_opt, pen)  # Return the cost function value
 
     # Use minimize_scalar to find the best alpha
     result = minimize_scalar(objective)
