@@ -5,7 +5,7 @@ from tqdm import tqdm  # Pour la barre de progression
 from scipy.optimize import minimize_scalar
 from costFunction import *
 from FEM import *
-
+from projectionMethod import *
 
 
 
@@ -135,3 +135,54 @@ def augmentedLine_search(u, grad_u, cost_function, dim_opt, pen):
     # Use minimize_scalar to find the best alpha
     result = minimize_scalar(objective)
     return result.x  # Return the optimal alpha
+
+
+def gradient_descentProjected(Var_opt, alpha, iterations, K_ref, dim_opt):
+    """
+    Perform gradient descent to minimize the cost function
+    :param Var_opt: the initial design variables
+    :param alpha: the learning rate
+    :param iterations: number of iterations for the gradient descent
+    :return: the optimized design variables
+    """
+    errors = []  # Liste pour stocker les erreurs à chaque itération
+    for iter in tqdm(range(iterations), desc="Fixed Step Optimization"):
+        T = simulator(0, Var_opt, dim_opt)
+        lambda_adj = compute_adjoint(T, T_star, K_ref)
+        grad = compute_gradient(lambda_adj, Var_opt, dim_opt)
+
+        #S = constraintFunction(Var_opt, dim_opt)
+        grad_constraint = constraintGradient(Var_opt, dim_opt)
+
+        projected_grad = grad - np.dot(grad, grad_constraint) * grad_constraint
+
+        Var_opt -= alpha * projected_grad
+        cost = costFunction(T)
+        errors.append(cost)  # Ajouter l'erreur à la liste
+        #print(f"Iteration {iter+1}, Cost Function: {cost}")
+    return Var_opt, errors
+
+def gradient_descent_with_line_search(Var_opt, iterations, K_ref, dim_opt):
+    """
+    Perform gradient descent with optimal step size determined by line search
+    :param Var_opt: the initial design variables
+    :param iterations: number of iterations for the gradient descent
+    :return: the optimized design variables
+    """
+    errors = []  # Liste pour stocker les erreurs à chaque itération
+    for iter in tqdm(range(iterations), desc="Optimal Step Optimization"):
+        T = simulator(0, Var_opt, dim_opt)
+        lambda_adj = compute_adjoint(T, T_star, K_ref)
+
+        grad = compute_gradient(lambda_adj, Var_opt, dim_opt)
+
+        grad_constraint = constraintGradient(Var_opt, dim_opt)
+
+        projected_grad = grad - np.dot(grad, grad_constraint) * grad_constraint
+
+        alpha = line_search(Var_opt, grad, costFunction, dim_opt)
+        Var_opt -= alpha * projected_grad
+        cost = costFunction(T)
+        errors.append(cost)  # Ajouter l'erreur à la liste
+        #print(f"Iteration {iter+1}, Cost Function: {cost}, Optimal Alpha: {alpha}")
+    return Var_opt, errors

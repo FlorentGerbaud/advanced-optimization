@@ -137,5 +137,30 @@ def augmentedCompute_gradient(lambda_adj, Var_opt, dim_opt, pen):
 
     return grad
 
+def lagrangianCompute_gradientByVarOpt(lambda_adj, Var_opt, dim_opt, beta):
+    """
+    Compute the gradient of the cost function with respect to Var_opt, including the energy constraint term.
+    """
+    S = compute_source(Var_opt, dim_opt)  # Heat source
+    # Energy constraint gradient (additional term)
+    energy_grad = np.sum(S) * h  # The energy constraint term
+    # Original gradient: using the adjoint solution
+    grad = np.zeros_like(Var_opt)
+    integraleB_i = np.zeros_like(Var_opt)
+
+    for i in range(dim_opt):
+        for j in range(Xg.shape[0]):
+            grad[i] += - lambda_adj[j] * math.comb(dim_opt - 1, i) * Xg[j] ** i * (1 - Xg[j]) ** (dim_opt - 1 - i) * h
+
+    for i in range(dim_opt):
+        for j in range(Xg.shape[0]):
+            integraleB_i[i] +=  math.comb(dim_opt - 1, i) * Xg[j] ** i * (1 - Xg[j]) ** (dim_opt - 1 - i) * h
+
+    energy_penalty_grad = beta * integraleB_i # Derivative of energy penalty term
+    # Adjust the gradient
+    grad += energy_penalty_grad
+
+    return grad
+
 
 

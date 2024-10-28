@@ -4,11 +4,12 @@ from performGradient import *
 from tqdm import tqdm  # Pour la barre de progression
 from heatedBar import *
 import matplotlib
-matplotlib.use('TkAgg')  # Ou 'Qt5Agg' si vous avez PyQt5 installé
+matplotlib.use('Agg')  # Ou 'Qt5Agg' si vous avez PyQt5 installé
 import matplotlib.pyplot as plt
+
 import numpy as np
 from variables import *
-from scipy.optimize import minimize
+from scipy.optimize import minimize_scalar, minimize
 import itertools
 
 
@@ -70,28 +71,77 @@ def lagragianGradient_descent(Var_opt, alpha_1, alpha_2, iterations, K_ref, dim_
     return Var_opt, errors
 
 
-# def lagrangianLine_search(u, grad_u, grad_beta, beta, dim_opt):
-#     """
-#     Effectue une recherche de ligne pour trouver les pas optimaux alpha_1 et alpha_2.
-#     """
-#     # Objectif pour alpha_1 (minimisation en fonction de u)
-#     def objective_1(alpha_1):
-#         u_new = u - alpha_1 * grad_u
-#         T = simulator(0, u_new, dim_opt)  # Simule le problème direct avec u modifié
-#         return lagrangianFunction(T, u_new, dim_opt, beta)
-#
-#     # Objectif pour alpha_2 (mise à jour de beta)
-#     def objective_2(alpha_2):
-#         beta_new = beta + alpha_2 * grad_beta
-#         T = simulator(0, u, dim_opt)  # Simule sans changer u, car on optimise beta
-#         return -lagrangianFunction(T, u, dim_opt, beta_new)
-#
-#     # Utilisation de `minimize_scalar` pour trouver les meilleurs alpha_1 et alpha_2
-#     result_1 = minimize_scalar(objective_1)
-#     result_2 = minimize_scalar(objective_2)
-#     return result_1.x, result_2.x
+def lagrangianLine_search(u, grad_u, grad_beta, beta, dim_opt):
+    """
+    Effectue une recherche de ligne pour trouver les pas optimaux alpha_1 et alpha_2.
+    """
+    # Objectif pour alpha_1 (minimisation en fonction de u)
+    def objective_1(alpha_1):
+        u_new = u - alpha_1 * grad_u
+        T = simulator(0, u_new, dim_opt)  # Simule le problème direct avec u modifié
+        return lagrangianFunction(T, u_new, dim_opt, beta)
+
+    # Objectif pour alpha_2 (mise à jour de beta)
+    def objective_2(alpha_2):
+        beta_new = beta + alpha_2 * grad_beta
+        T = simulator(0, u, dim_opt)  # Simule sans changer u, car on optimise beta
+        return -lagrangianFunction(T, u, dim_opt, beta_new)
+
+    # Utilisation de `minimize_scalar` pour trouver les meilleurs alpha_1 et alpha_2
+    result_1 = minimize_scalar(objective_1)
+    result_2 = minimize_scalar(objective_2)
+    return result_1.x, result_2.x
 
 
+def lagrangianGradient_descent_with_line_search(Var_opt, iterations, K_ref, dim_opt, beta):
+    """
+    Perform gradient descent with optimal step size determined by line search
+    :param Var_opt: the initial design variables
+    :param iterations: number of iterations for the gradient descent
+    :return: the optimized design variables
+    """
+    errors = []  # Liste pour stocker les erreurs à chaque itération
+    for iter in tqdm(range(iterations), desc="Optimal Step Optimization"):
+        T = simulator(0, Var_opt, dim_opt)
+        S = compute_source(Var_opt, dim_opt)
+        integraleofS = np.sum(S) * h
+        lambda_adj = compute_adjoint(T, T_star, K_ref)
+        grad = compute_gradient(lambda_adj, Var_opt, dim_opt)
+        #alpha = line_search(Var_opt, grad, costFunction, dim_opt)
+        alpha_1, alpha_2 = lagrangianLine_search(Var_opt, grad, integraleofS, beta, dim_opt)
+        Var_opt -= alpha * grad
+        beta += alpha_2 * integraleofS
+        cost = costFunction(T)
+        errors.append(cost)  # Ajouter l'erreur à la liste
+        #print(f"Iteration {iter+1}, Cost Function: {cost}, Optimal Alpha: {alpha}")
+    return Var_opt, errors
+
+
+def lagrangianGradient_descent_with_line_search_VGpt(Var_opt, iterations, K_ref, dim_opt, beta):
+    errors = []
+    for iter in tqdm(range(iterations), desc="Optimal Step Optimization"):
+        T = simulator(0, Var_opt, dim_opt)
+        S = compute_source(Var_opt, dim_opt)
+        integraleofS = np.sum(S) * h
+        lambda_adj = compute_adjoint(T, T_star, K_ref)
+        grad_u = lagrangianCompute_gradientByVarOpt(lambda_adj, Var_opt, dim_opt, beta)
+
+        def line_search_objective(alpha):
+            alpha_1, alpha_2 = alpha
+            u_new = Var_opt - alpha_1 * grad_u
+            beta_new = beta + alpha_2 * integraleofS
+            T_new = simulator(0, u_new, dim_opt)
+            return lagrangianFunction(T_new, u_new, dim_opt, beta_new)
+
+        result = minimize(line_search_objective, [0.01, 0.01], bounds=[(0, None), (0, None)])
+        alpha_1, alpha_2 = result.x
+
+        Var_opt -= alpha_1 * grad_u
+        beta += alpha_2 * integraleofS
+        cost = costFunction(T)
+        errors.append(cost)
+
+    return Var_opt, errors
 
 
 def lagrangien_difference_gradient_centered(Var_opt, epsilon, dim_opt, beta):
@@ -192,7 +242,7 @@ if __name__ == '__main__':
     # solve the problem for initial conditions
     T_ini = FiniteElement.simulator(0, Var_ini, dim_opt)
 
-    iterations = 100
+    iterations = 1000
     alpha_1 = 20
     alpha_2 = 0.01
     dim_opt = 6
@@ -203,7 +253,7 @@ if __name__ == '__main__':
     # pen=0.048
     beta = 0
 
-    choice = 4
+    choice = 1
 
     if choice == 0:
         comparePerformedGradient(dim_opt, K_ref, beta)
@@ -234,7 +284,7 @@ if __name__ == '__main__':
         plt.ylabel('Error')
         plt.title('Error as a function of Iterations')
         plt.grid()
-        plt.show()
+        plt.savefig("Error With lagrangian.png")
 
         # Plot results
         plt.figure(figsize=(12, 6))
@@ -246,7 +296,7 @@ if __name__ == '__main__':
         plt.title('Comparison of Initial, Target and Optimized Temperature')
         plt.legend(loc="lower right")
         plt.grid()
-        plt.show()
+        plt.savefig("temp With lagrangian.png")
 
         # Plot source term
         plt.figure(figsize=(10, 6))
@@ -255,7 +305,7 @@ if __name__ == '__main__':
         plt.ylabel('Source Term')
         plt.title('Source Term along x')
         plt.grid()
-        plt.show()
+        plt.savefig("source with lagrangian.png")
 
 
     elif choice == 2:
@@ -308,18 +358,18 @@ if __name__ == '__main__':
 
     elif choice == 4:
         #use oprimal step
-        Var_optWithOptimalStep, errors_optimal_step = lagrangianGradient_descent_adaptive_step(Var_ini,
-                                                                                               iterations,
-                                                                                                K_ref,
-                                                                                                dim_opt,
-                                                                                                beta,
-                                                                                                alpha_1_init=1.0,
-                                                                                                alpha_2_init=0.001,
-                                                                                                reduction_factor_1=0.7,
-                                                                                                increase_factor_1=1.2,
-                                                                                                reduction_factor_2=0.5,
-                                                                                                increase_factor_2=1.1)
+        #Var_optWithOptimalStep, errors_optimal_step = lagrangianGradient_descent_adaptive_step(Var_ini,
+        # Var_optWithOptimalStep, errors_optimal_step = lagrangianGradient_descent_with_line_search(Var_ini,
+        #                                                                                     iterations,
+        #                                                                                         K_ref,
+        #                                                                                         dim_opt,
+        #                                                                                         beta)
 
+        Var_optWithOptimalStep, errors_optimal_step = lagrangianGradient_descent_with_line_search_VGpt(Var_ini,
+                                                                                            iterations,
+                                                                                            K_ref,
+                                                                                            dim_opt,
+                                                                                            beta)
 
         TOptimalStep = simulator(0, Var_optWithOptimalStep, dim_opt)
         print("Optimized design variables with optimal step: ", Var_optWithOptimalStep)

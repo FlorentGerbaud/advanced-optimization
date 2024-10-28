@@ -3,7 +3,7 @@ from gradientDescent import *
 from variables import *
 import FEM as FiniteElement
 import matplotlib
-matplotlib.use('Qt5Agg')  # or another interactive backend like 'Qt5Agg'
+matplotlib.use('Agg')  # or another interactive backend like 'Qt5Agg'
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -44,7 +44,7 @@ K_ref = FiniteElement.compute_conduction(0)
 T_ini = FiniteElement.simulator(0, Var_ini, dim_opt)
 
 iterations = 500
-alpha = 0
+alpha = 20
 dim_opt = 6
 #Var_ini = np.full(dim_opt, 0.0)
 #Var_ini = np.array([-21.36202421, 34.90290328, -19.76296709, -32.44794981, 45.26660816, -21.05999423])
@@ -52,15 +52,15 @@ dim_opt = 6
 Var_ini = np.random.rand(dim_opt)
 #pen=0.048
 pen_fixe = 0.0247
-pen_opt = 10e-7
+pen_opt = 0.0247
 if choice == 0:
 
-    Var_optWithFixStep, errors_fixed_step = augmentedGradient_descent_with_line_search(Var_ini,
-                                                                        iterations,
-                                                                        K_ref,
-                                                                        dim_opt,
-                                                                        pen_opt)
-    #Var_optWithFixStep, errors_fixed_step = augmentedGradient_descent(Var_ini, alpha, iterations, K_ref, dim_opt, pen_fixe)
+    # Var_optWithFixStep, errors_fixed_step = augmentedGradient_descent_with_line_search(Var_ini,
+    #                                                                     iterations,
+    #                                                                     K_ref,
+    #                                                                     dim_opt,
+    #                                                                     pen_opt)
+    Var_optWithFixStep, errors_fixed_step = augmentedGradient_descent(Var_ini, alpha, iterations, K_ref, dim_opt, pen_fixe)
     TFixedStep = simulator(0, Var_optWithFixStep, dim_opt)
     print("Optimized design variables with fixed step: ", Var_optWithFixStep)
 
