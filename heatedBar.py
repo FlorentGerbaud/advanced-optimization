@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # choice = 3 compare fixed step with different alpha valuees from 0.01 to 20
     # choice = 4 compare the error with the target for both method from fixed step and optimal step with number of Var from 2 to 100
 
-    choice = 9
+    choice = 6
 
     if choice == 1:
 

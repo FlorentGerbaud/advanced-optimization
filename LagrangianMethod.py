@@ -8,6 +8,7 @@ import performGradient as pg
 from FEM import *
 from costFunction import *
 import os
+import time
 
 #_______________________________________ define functions ______________________________
 
@@ -124,8 +125,6 @@ def findbestAlpha_2(Var_ini, alpha_1, alpha_2, iterations, K_ref, dim_opt, beta)
 
 
 
-import os
-import time
 
 def solveLagrangienFunction(Var_ini, alpha, iterations, K_ref, dim_opt, T_ini, beta, alpha_1, alpha_2):
     # Définir le nom du répertoire pour cette méthode
