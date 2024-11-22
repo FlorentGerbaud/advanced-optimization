@@ -106,6 +106,8 @@ def solveProjectedGradientMethodWithStepFixed(Var_ini, alpha, iterations, K_ref,
 
     print(f"Résultats sauvegardés dans le fichier : {file_name}")
 
+    return TFixedStep, S_check, errors_fixed_step
+
 
 
 def solveProjectedGradientMethodWithStepOptimal(Var_ini, iterations, K_ref, dim_opt, T_ini, method_name="projected"):
@@ -182,6 +184,8 @@ def solveProjectedGradientMethodWithStepOptimal(Var_ini, iterations, K_ref, dim_
         file.write(f"Total Processing Time: {time_optimal_step:.2f} seconds\n")
 
     print(f"Résultats sauvegardés dans le fichier : {file_name}")
+
+    return TOptimalStep, S_check, errors_line_search
 
 
 
