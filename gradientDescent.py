@@ -2,7 +2,7 @@
 
 from projectionMethod import *
 import performGradient as pg
-from LagrangianMethod import lagrangianFunction
+from lagrangianCore import lagrangianFunction
 from scipy.optimize import minimize_scalar
 
 ############################################################################################################

@@ -6,6 +6,7 @@ import FEM as FiniteElement
 import optimisation as opt
 import projectionMethod as proj
 import LagrangianMethod as lag
+import CompareConstraints as cc
 
 #_______________________________________ main program _______________________________________#
 ##############################################################################################
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     # choice = 3 compare fixed step with different alpha valuees from 0.01 to 20
     # choice = 4 compare the error with the target for both method from fixed step and optimal step with number of Var from 2 to 100
 
-    choice = 6
+    choice = 5
 
     if choice == 1:
 
@@ -99,3 +100,19 @@ if __name__ == '__main__':
                             K_ref=K_ref,
                             dim_opt=dim_opt,
                             beta=beta)
+
+    elif choice == 10:
+
+        cc.solve_and_plot(alpha=alpha,
+                          iterations=iterations,
+                          K_ref=K_ref, dim_opt=dim_opt,
+                          method_name="projected")
+
+    elif choice == 11:
+
+        cc.solve_and_plot_with_optimal_step(iterations=iterations,
+                                            K_ref=K_ref,
+                                            dim_opt=dim_opt,
+                                            method_name="projected")
+
+

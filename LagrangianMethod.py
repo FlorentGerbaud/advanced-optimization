@@ -9,23 +9,12 @@ from FEM import *
 from costFunction import *
 import os
 import time
+from lagrangianCore import lagrangianFunction
 
 #_______________________________________ define functions ______________________________
 
 ##################################### lagrangianFunction #####################################
 #_____________________________________________________________________________________________
-
-def lagrangianFunction(T_ini, var_opt, dim_opt, beta):
-    """
-    :param T_ini: initial temperature
-    :param var_opt: design variables
-    :param dim_opt: number of design variables
-    :param beta: Lagrangian coefficient
-    :return: the cost function with the energy constraint
-    """
-    S = compute_source(var_opt, dim_opt)
-    integraleofS = np.sum(S) * h
-    return costFunction(T_ini) + beta * integraleofS
 
 
 def comparePerformedGradient(dim_opt, K_ref, beta):
@@ -193,3 +182,6 @@ def solveLagrangienFunction(Var_ini, alpha, iterations, K_ref, dim_opt, T_ini, b
         file.write(f"Total Processing Time: {time_fixed_step:.2f} seconds\n")
 
     print(f"Résultats sauvegardés dans le répertoire : {dir_name}")
+
+    return TFixedStep, S_check, errors_fixed_step
+

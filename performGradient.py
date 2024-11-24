@@ -4,7 +4,7 @@ from costFunction import *
 from FEM import *
 import math
 from variables import *
-from LagrangianMethod import lagrangianFunction
+from lagrangianCore import lagrangianFunction
 
 #_______________________________________ define functions __________________________________________________
 
